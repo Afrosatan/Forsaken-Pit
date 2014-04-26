@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" id="ng-app" ng-app="pitModule">
+<head>
+<meta charset="UTF-8" />
+
+<title>Forsaken Pit</title>
+<script
+  src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.min.js"></script>
+
+<script src="/js/webservice.js"></script>
+
+<script src="/js/common.js"></script>
+<link rel="stylesheet" type="text/css" href="/css/common.css" />
+
+<script src="/index.js"></script>
+<link rel="stylesheet" type="text/css" href="/index.css" />
+
+</head>
+<body ng-controller="IndexCtrl">
+  <div id="new"></div>
+
+  <div id="game">
+    <div class="cell-row" ng-repeat="cellRow in cellRows">
+      <div class="cell" ng-repeat="cell in cellRow">
+        <img src="/img/ground.png">
+        <img ng-show="cell.obj" ng-src="/img/{{cell.obj.type}}.png">
+      </div>
+    </div>
+  </div>
+</body>
+</html>
