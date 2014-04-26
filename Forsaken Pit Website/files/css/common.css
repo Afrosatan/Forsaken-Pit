@@ -28,6 +28,7 @@ html,body {
 	-ms-text-size-adjust: none;
 	text-size-adjust: none;
 	background-color: #000000;
+	color: #FFFFFF;
 }
 
 /* I don't know why I would ever NOT want the table to collapse borders */

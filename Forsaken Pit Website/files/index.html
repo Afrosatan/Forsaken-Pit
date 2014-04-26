@@ -17,13 +17,46 @@
 
 </head>
 <body ng-controller="IndexCtrl">
-  <div id="new"></div>
+  <div id="new">
+    <table>
+      <tbody>
+        <tr>
+          <td>
+            <input type="text" placeholder="New Character Name"
+              ng-model="newName">
+          </td>
+          <td>
+            <input id="type-red" type="radio" name="type" value="Red"
+              ng-model="newType">
+            <label for="type-red">Red</label>
+          </td>
+          <td>
+            <input id="type-green" type="radio" name="type"
+              value="Green" ng-model="newType">
+            <label for="type-green">Green</label>
+          </td>
+          <td>
+            <input id="type-blue" type="radio" name="type" value="Blue"
+              ng-model="newType">
+            <label for="type-blue">Blue</label>
+          </td>
+          <td>
+            <input type="button" value="New Character"
+              ng-click="createNewCharacter()"
+              ng-disabled="newCharacterCall.running">
+          </td>
+          <td id="new-message">{{newCharacterMessage}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
   <div id="game">
     <div class="cell-row" ng-repeat="cellRow in cellRows">
       <div class="cell" ng-repeat="cell in cellRow">
         <img src="/img/ground.png">
         <img ng-show="cell.obj" ng-src="/img/{{cell.obj.type}}.png">
+        <span ng-show="cell.obj" class="obj-name">{{cell.obj.name}}</span>
       </div>
     </div>
   </div>

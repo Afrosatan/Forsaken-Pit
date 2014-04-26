@@ -3,10 +3,11 @@
 }
 
 .cell {
-	position:relative;
+	position: relative;
 	display: inline-block;
 	height: 50px;
 	width: 50px;
+	display: inline-block;
 }
 
 .cell>img {
@@ -15,4 +16,42 @@
 	left: 0px;
 	height: 50px;
 	width: 50px;
+}
+
+#new td {
+	padding: 5px;
+}
+
+.cell .obj-name {
+	display: none;
+}
+
+.cell:hover .obj-name {
+	display: inline-block;
+}
+
+.obj-name {
+	position: absolute;
+	bottom: 100%;
+	white-space: nowrap;
+	font-weight: bold;
+}
+
+label[for="type-red"] {
+	color: red;
+	font-weight: bold;
+}
+
+label[for="type-green"] {
+	color: #55FF55;
+	font-weight: bold;
+}
+
+label[for="type-blue"] {
+	color: #7777FF;
+	font-weight: bold;
+}
+
+#new-message {
+	color: #FF0000;
 }

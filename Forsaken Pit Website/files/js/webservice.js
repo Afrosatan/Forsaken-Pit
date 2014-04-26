@@ -1,6 +1,6 @@
 var pitwebModule = angular.module("pitweb", []);
 
-function PitWebCall() {
+function PitwebCall() {
 	this.running = false;
 	this.runId = 0;
 	this.complete = function(data, status, statusText) {
@@ -38,10 +38,10 @@ function callWrapper(http, call) {
 function pitwebFactory($http) {
 	var instance = {};
 
-	instance.logIn = function(account, pass, call) {
-		var http = $http.post("/api/login/authenticate", {
-			"accountName" : account,
-			"password" : pass
+	instance.createNewPlayer = function(name, type, call) {
+		var http = $http.post("/pitapi/player/create", {
+			"name" : name,
+			"type" : type
 		});
 		callWrapper(http, call);
 	};
