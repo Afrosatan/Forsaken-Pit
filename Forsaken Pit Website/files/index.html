@@ -53,12 +53,45 @@
 
   <div id="game">
     <div class="cell-row" ng-repeat="cellRow in cellRows">
-      <div class="cell" ng-repeat="cell in cellRow">
+      <div class="cell" ng-repeat="cell in cellRow"
+        ng-click="onCellClick($event, cell)"
+        ng-class="{'selected-cell': cell===selectedCell}">
         <img src="/img/ground.png">
-        <img ng-show="cell.obj" ng-src="/img/{{cell.obj.type}}.png">
-        <span ng-show="cell.obj" class="obj-name">{{cell.obj.name}}</span>
+        <div class="cell-hover"></div>
+
+        <img ng-src="/img/{{obj.type}}.png"
+          ng-repeat-start="obj in cell.objs">
+        <span class="obj-name" ng-repeat-end>{{obj.name}}</span>
+
       </div>
     </div>
+
+    <div class="game-dropdown" ng-show="showingDropdown"
+      ng-style="dropdownStyle">
+      <div ng-repeat="action in dropdownActions">
+        <input type="button" value="{{action.title}}"
+          ng-click="doAction(action)">
+      </div>
+    </div>
+  </div>
+
+  <div id="data">
+    <table>
+      <tbody>
+        <tr>
+          <td class="data-title">Name</td>
+          <td>
+            {{player_name}} (
+            <span ng-class="player_type">{{player_type}}</span>
+            )
+          </td>
+        </tr>
+        <tr>
+          <td class="data-title">Depth</td>
+          <td>{{depth}}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </body>
 </html>

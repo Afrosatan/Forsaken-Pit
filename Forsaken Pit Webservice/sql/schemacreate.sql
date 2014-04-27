@@ -12,11 +12,12 @@ alter role fpit_ws set search_path to fpit;
 
 create table actor (
 id BIGSERIAL,
-actor_type char(20) not null,
+actor_type varchar(20) not null,
 name varchar(20),
 level_depth int not null,
 x int not null,
 y int not null,
+next_action_time BIGINT NOT NULL,
 PRIMARY KEY(id)
 );
 create index actor__level_depth__x__y on actor (x, y);

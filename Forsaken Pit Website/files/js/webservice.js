@@ -46,6 +46,22 @@ function pitwebFactory($http) {
 		callWrapper(http, call);
 	};
 
+	instance.update = function(player_key, call) {
+		var http = $http.post("/pitapi/update", {
+			"player_key" : player_key
+		});
+		callWrapper(http, call);
+	};
+
+	instance.move = function(player_key, x, y, call) {
+		var http = $http.post("/pitapi/move", {
+			"player_key" : player_key,
+			"x" : x,
+			"y" : y
+		});
+		callWrapper(http, call);
+	};
+
 	return instance;
 }
 

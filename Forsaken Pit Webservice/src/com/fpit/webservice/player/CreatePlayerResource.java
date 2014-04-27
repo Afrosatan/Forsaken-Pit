@@ -52,6 +52,7 @@ public class CreatePlayerResource extends CommonResource {
 					fvs.put("level_depth", 1);
 					fvs.put("x", rand.nextInt(100));
 					fvs.put("y", rand.nextInt(100));
+					fvs.put("next_action_time", System.currentTimeMillis());
 					Object actor_id = connect.directInsert("actor", fvs);
 
 					fvs.clear();

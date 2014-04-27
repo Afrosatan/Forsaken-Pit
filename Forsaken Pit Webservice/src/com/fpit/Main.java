@@ -15,7 +15,9 @@ import org.slf4j.LoggerFactory;
 import com.fpit.data.DBException;
 import com.fpit.util.GsonMessageBodyHandler;
 import com.fpit.webservice.CommonResource;
+import com.fpit.webservice.move.MoveResource;
 import com.fpit.webservice.player.CreatePlayerResource;
+import com.fpit.webservice.update.UpdateResource;
 
 /**
  * Main executable class to bootstrap the grizzly http server using jersey endpoints.
@@ -28,6 +30,8 @@ public class Main {
 
 		//web service endpoints
 		resourceConfig.register(CreatePlayerResource.class);
+		resourceConfig.register(UpdateResource.class);
+		resourceConfig.register(MoveResource.class);
 
 		//other resources
 		resourceConfig.register(GsonMessageBodyHandler.class);

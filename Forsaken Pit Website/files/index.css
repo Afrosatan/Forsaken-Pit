@@ -18,6 +18,25 @@
 	width: 50px;
 }
 
+.cell-hover {
+	display: none;
+	background-color: yellow;
+	opacity: 0.5;
+}
+
+.selected-cell .cell-hover {
+	background-color: green;
+}
+
+.cell:hover .cell-hover,.selected-cell .cell-hover {
+	display: inline-block;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+}
+
 #new td {
 	padding: 5px;
 }
@@ -30,6 +49,10 @@
 	display: inline-block;
 }
 
+.cell:hover {
+	
+}
+
 .obj-name {
 	position: absolute;
 	bottom: 100%;
@@ -37,21 +60,44 @@
 	font-weight: bold;
 }
 
-label[for="type-red"] {
+label[for="type-red"],.Red {
 	color: red;
 	font-weight: bold;
 }
 
-label[for="type-green"] {
+label[for="type-green"],.Green {
 	color: #55FF55;
 	font-weight: bold;
 }
 
-label[for="type-blue"] {
+label[for="type-blue"],.Blue {
 	color: #7777FF;
 	font-weight: bold;
 }
 
 #new-message {
 	color: #FF0000;
+}
+
+#game {
+	display: inline-block;
+	padding: 20px;
+	position: relative;
+}
+
+#data {
+	display: inline-block;
+	vertical-align: top;
+}
+
+.data-title {
+	padding-right: 10px;
+	font-weight: bold;
+	color: #BBBBBB;
+}
+
+.game-dropdown {
+	display: inline-block;
+	position: absolute;
+	border: 2px solid #999999;
 }
