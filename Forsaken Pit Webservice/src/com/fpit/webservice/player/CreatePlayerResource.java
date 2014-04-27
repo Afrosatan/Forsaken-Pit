@@ -12,6 +12,7 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fpit.Constants;
 import com.fpit.data.ConnectionWrapper;
 import com.fpit.data.RunInTransaction;
 import com.fpit.util.StringUtil;
@@ -50,14 +51,18 @@ public class CreatePlayerResource extends CommonResource {
 							+ request.type.toString().toLowerCase());
 					fvs.put("name", name);
 					fvs.put("level_depth", 1);
-					fvs.put("x", rand.nextInt(100));
-					fvs.put("y", rand.nextInt(100));
+					fvs.put("x", rand.nextInt(Constants.MAP_SIZE));
+					fvs.put("y", rand.nextInt(Constants.MAP_SIZE));
 					fvs.put("next_action_time", System.currentTimeMillis());
+					fvs.put("firepower", 40);
+					fvs.put("health", 200);
+					fvs.put("max_health", 200);
 					Object actor_id = connect.directInsert("actor", fvs);
 
 					fvs.clear();
 					fvs.put("player_key", player_key);
 					fvs.put("actor_id", actor_id);
+					fvs.put("points", 0);
 					connect.directInsert("player", fvs);
 				}
 			});

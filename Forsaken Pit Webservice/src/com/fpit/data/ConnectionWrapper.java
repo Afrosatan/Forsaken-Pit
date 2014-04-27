@@ -1,6 +1,5 @@
 package com.fpit.data;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,13 +9,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fpit.data.DBMetaData.DBFieldData;
-import com.fpit.data.DBMetaData.DBFieldType;
 
 /**
  * Wrapper around a single database Connection.
@@ -74,121 +69,6 @@ public class ConnectionWrapper {
 			retval.add(new DBRow(dbm, rs));
 		}
 		return retval;
-	}
-
-	/**
-	 * Update the table/row provided with new values.
-	 * @param tableName The name of the table to update a record in.
-	 * @param row Row with the current DB values of the row to be updated. This row will be updated with values from fieldValues if the update succeeds.
-	 * @param fieldValues Map with the new column values for the row.
-	 */
-	public void update(String tableName, DBRow row,
-			Map<String, Object> fieldValues) throws SQLException {
-		final List<Object> parameters = new ArrayList<Object>();
-		final StringBuilder sql = new StringBuilder("UPDATE ");
-		sql.append(tableName);
-		sql.append(" SET ");
-		boolean first = true;
-		for (Entry<String, Object> entry : fieldValues.entrySet()) {
-			Object obj = row.getObject(entry.getKey());
-			if (obj == null) {
-				if (entry.getValue() == null) {
-					continue;
-				}
-			} else if (entry.getValue() != null) {
-				if (entry.getValue().equals(obj)) {
-					continue;
-				}
-			}
-			if (first) {
-				first = false;
-			} else {
-				sql.append(", ");
-			}
-			sql.append(entry.getKey());
-			sql.append(" = ? ");
-			parameters.add(entry.getValue());
-		}
-		if (first) { // no changes
-			return;
-		}
-		sql.append(" WHERE ");
-		first = true;
-		for (DBFieldData field : row.getMetadata().getFieldData().values()) {
-			if (first) {
-				first = false;
-			} else {
-				sql.append(" AND ");
-			}
-			Object obj = row.getObject(field.getName());
-			if (obj != null) {
-				sql.append(field.getName());
-				sql.append(" = ? ");
-				parameters.add(obj);
-			} else {
-				sql.append(field.getName());
-				sql.append(" IS NULL ");
-			}
-		}
-
-		logger.trace("SQL: " + sql);
-		logger.trace("Parameters: " + Arrays.toString(parameters.toArray()));
-
-		inTransaction(new RunInTransaction() {
-			@Override
-			public void run(ConnectionWrapper connect) throws SQLException {
-				try (PreparedStatement ps = connection.prepareStatement(sql
-						.toString())) {
-					for (int i = 1; i <= parameters.size(); i++) {
-						ps.setObject(i, parameters.get(i - 1));
-					}
-					int n = ps.executeUpdate();
-					if (n == 0) {
-						throw new SQLException(
-								"No rows affected during update, rolling back");
-					} else if (n > 1) {
-						throw new SQLException(
-								"Multiple rows affected during update, rolling back");
-					}
-				}
-			}
-		});
-
-		for (Entry<String, Object> entry : fieldValues.entrySet()) {
-			row.setObject(entry.getKey(), entry.getValue());
-		}
-	}
-
-	/**
-	 * Insert a record into the database, with values gathered from a map and a DBRow.
-	 * @param tableName The name of the table to insert a record into.
-	 * @param generatedKeyField If there is a generated key, this is the field it will be put in.
-	 * @param row The dbrow with the metadata and default field values. 
-	 * 			This row will be altered with any different objects in the fieldValues map and the generated key if applicable.
-	 * @param fieldValues Any column key-value pairs that should be set on the new record. 
-	 * 			If there is a field on the dbrow that isn't in this map, the default value will be pulled from the dbrow. 
-	 * 			This map may be modified by this function.
-	 */
-	public void insert(String tableName, String generatedKeyField, DBRow row,
-			Map<String, Object> fieldValues) throws SQLException {
-		for (DBFieldData field : row.getMetadata().getFieldData().values()) {
-			if (!fieldValues.containsKey(field.getName())) {
-				fieldValues
-						.put(field.getName(), row.getObject(field.getName()));
-			}
-		}
-		Object key = directInsert(tableName, fieldValues);
-		if (generatedKeyField != null) {
-			if (row.getMetadata().getFieldData().get(generatedKeyField)
-					.getType() == DBFieldType.LONG
-					&& key instanceof BigDecimal) {
-				key = ((BigDecimal) key).longValue(); // I don't know why, but the drivers return BigDecimals for generated keys instead of Longs?
-			}
-			fieldValues.put(generatedKeyField, key);
-		}
-		for (Entry<String, Object> entry : fieldValues.entrySet()) {
-			row.setObject(entry.getKey(), entry.getValue());
-		}
 	}
 
 	/**
@@ -262,61 +142,6 @@ public class ConnectionWrapper {
 		});
 
 		return key.key;
-	}
-
-	/**
-	 * Delete a record from the database identified by the field values of a DBRow.
-	 * @param tableName The name of the table to delete a record from.
-	 * @param row DBRow to identify the record to be deleted.
-	 * @throws SQLException From the various JDBC methods used or if more than one record is deleted, or if no records were deleted.
-	 */
-	public void delete(String tableName, DBRow row) throws SQLException {
-		final List<Object> parameters = new ArrayList<Object>();
-		final StringBuilder sql = new StringBuilder("DELETE FROM ");
-		sql.append(tableName);
-		sql.append(" WHERE ");
-		boolean first = true;
-		List<String> fields = new ArrayList<String>(row.getMetadata()
-				.getFieldData().keySet());
-		for (String field : fields) {
-			if (first) {
-				first = false;
-			} else {
-				sql.append("AND ");
-			}
-			Object obj = row.getObject(field);
-			if (obj != null) {
-				sql.append(field);
-				sql.append(" = ? ");
-				parameters.add(obj);
-			} else {
-				sql.append(field);
-				sql.append(" IS NULL ");
-			}
-		}
-
-		logger.trace("SQL: " + sql);
-		logger.trace("Parameters: " + Arrays.toString(parameters.toArray()));
-
-		inTransaction(new RunInTransaction() {
-			@Override
-			public void run(ConnectionWrapper connect) throws SQLException {
-				try (PreparedStatement ps = connection.prepareStatement(sql
-						.toString())) {
-					for (int i = 1; i <= parameters.size(); i++) {
-						ps.setObject(i, parameters.get(i - 1));
-					}
-					int n = ps.executeUpdate();
-					if (n == 0) {
-						throw new SQLException(
-								"No rows affected during delete.");
-					} else if (n > 1) {
-						throw new SQLException(
-								"Multiple rows affected during delete");
-					}
-				}
-			}
-		});
 	}
 
 	/**
@@ -397,20 +222,5 @@ public class ConnectionWrapper {
 
 	public void close() throws SQLException {
 		connection.close();
-	}
-
-	public DBMetaData getTableMetaData(String tableName) throws SQLException {
-		Statement st = null;
-		try {
-			st = connection.createStatement();
-			ResultSet rs = st.executeQuery("SELECT * FROM " + tableName
-					+ " WHERE 1 = 2");
-			DBMetaData dbm = new DBMetaData(rs.getMetaData());
-			return dbm;
-		} finally {
-			if (st != null) {
-				st.close();
-			}
-		}
 	}
 }

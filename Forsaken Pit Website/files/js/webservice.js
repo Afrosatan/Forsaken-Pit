@@ -62,6 +62,21 @@ function pitwebFactory($http) {
 		callWrapper(http, call);
 	};
 
+	instance.attack = function(player_key, actor_id, call) {
+		var http = $http.post("/pitapi/attack", {
+			"player_key" : player_key,
+			"actor_id" : actor_id
+		});
+		callWrapper(http, call);
+	};
+
+	instance.rest = function(player_key, call) {
+		var http = $http.post("/pitapi/rest", {
+			"player_key" : player_key
+		});
+		callWrapper(http, call);
+	};
+
 	return instance;
 }
 

@@ -90,38 +90,6 @@ public class DBControl {
 	}
 
 	/**
-	 * @see ConnectionWrapper#update(String, DBRow, Map)
-	 */
-	public void update(String tableName, DBRow row,
-			Map<String, Object> fieldValues) throws SQLException {
-		ConnectionWrapper wrapper = null;
-		try {
-			wrapper = new ConnectionWrapper(getConnection());
-			wrapper.update(tableName, row, fieldValues);
-		} finally {
-			if (wrapper != null) {
-				wrapper.close();
-			}
-		}
-	}
-
-	/**
-	 * @see ConnectionWrapper#insert(String, String, DBRow, Map)
-	 */
-	public void insert(String tableName, String generatedKeyField, DBRow row,
-			Map<String, Object> fieldValues) throws SQLException {
-		ConnectionWrapper wrapper = null;
-		try {
-			wrapper = new ConnectionWrapper(getConnection());
-			wrapper.insert(tableName, generatedKeyField, row, fieldValues);
-		} finally {
-			if (wrapper != null) {
-				wrapper.close();
-			}
-		}
-	}
-
-	/**
 	 * @see ConnectionWrapper#directInsert(String, Map)
 	 */
 	public Object directInsert(String tableName, Map<String, Object> fieldValues)
@@ -130,21 +98,6 @@ public class DBControl {
 		try {
 			wrapper = new ConnectionWrapper(getConnection());
 			return wrapper.directInsert(tableName, fieldValues);
-		} finally {
-			if (wrapper != null) {
-				wrapper.close();
-			}
-		}
-	}
-
-	/**
-	 * @see ConnectionWrapper#delete(String, DBRow)
-	 */
-	public void delete(String tableName, DBRow row) throws SQLException {
-		ConnectionWrapper wrapper = null;
-		try {
-			wrapper = new ConnectionWrapper(getConnection());
-			wrapper.delete(tableName, row);
 		} finally {
 			if (wrapper != null) {
 				wrapper.close();
@@ -170,17 +123,5 @@ public class DBControl {
 	public void close() {
 		pool.close();
 		pool = null;
-	}
-
-	public DBMetaData getTableMetaData(String tableName) throws SQLException {
-		ConnectionWrapper wrapper = null;
-		try {
-			wrapper = new ConnectionWrapper(getConnection());
-			return wrapper.getTableMetaData(tableName);
-		} finally {
-			if (wrapper != null) {
-				wrapper.close();
-			}
-		}
 	}
 }

@@ -15,8 +15,10 @@ import org.slf4j.LoggerFactory;
 import com.fpit.data.DBException;
 import com.fpit.util.GsonMessageBodyHandler;
 import com.fpit.webservice.CommonResource;
+import com.fpit.webservice.attack.AttackResource;
 import com.fpit.webservice.move.MoveResource;
 import com.fpit.webservice.player.CreatePlayerResource;
+import com.fpit.webservice.rest.RestResource;
 import com.fpit.webservice.update.UpdateResource;
 
 /**
@@ -32,6 +34,8 @@ public class Main {
 		resourceConfig.register(CreatePlayerResource.class);
 		resourceConfig.register(UpdateResource.class);
 		resourceConfig.register(MoveResource.class);
+		resourceConfig.register(AttackResource.class);
+		resourceConfig.register(RestResource.class);
 
 		//other resources
 		resourceConfig.register(GsonMessageBodyHandler.class);
@@ -68,6 +72,10 @@ public class Main {
 
 		final HttpServer httpServer = GrizzlyHttpServerFactory
 				.createHttpServer(uri, createResourceConfig());
+
+		final Thread cleanupThread = new Thread(new Cleanup());
+		cleanupThread.setDaemon(true);
+		cleanupThread.start();
 
 		logger.info("Application started... {}", uri);
 		try {

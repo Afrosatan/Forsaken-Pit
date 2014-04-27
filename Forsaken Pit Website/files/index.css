@@ -101,3 +101,20 @@ label[for="type-blue"],.Blue {
 	position: absolute;
 	border: 2px solid #999999;
 }
+
+.dropdown-button {
+	width: 100%;
+}
+
+.event-attack {
+	color: #CC3333;
+}
+
+.event-kill {
+	color: #FF0000;
+}
+
+.current-action {
+	font-size: 1.5em;
+	font-weight: bold;
+}

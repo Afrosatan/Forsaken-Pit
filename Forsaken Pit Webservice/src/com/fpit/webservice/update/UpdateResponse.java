@@ -13,4 +13,9 @@ public class UpdateResponse {
 	public String player_name;
 	public int depth;
 	public List<PitObject> objs;
+	public int firepower;
+	public int health;
+	public int max_health;
+	public int points;
+	public List<PitEvent> events;
 }

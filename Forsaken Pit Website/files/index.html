@@ -56,7 +56,8 @@
       <div class="cell" ng-repeat="cell in cellRow"
         ng-click="onCellClick($event, cell)"
         ng-class="{'selected-cell': cell===selectedCell}">
-        <img src="/img/ground.png">
+        <img src="/img/ground.png" ng-show="cell.grounded">
+        <img src="/img/ground2.png" ng-hide="cell.grounded">
         <div class="cell-hover"></div>
 
         <img ng-src="/img/{{obj.type}}.png"
@@ -65,13 +66,13 @@
 
       </div>
     </div>
+  </div>
 
-    <div class="game-dropdown" ng-show="showingDropdown"
-      ng-style="dropdownStyle">
-      <div ng-repeat="action in dropdownActions">
-        <input type="button" value="{{action.title}}"
-          ng-click="doAction(action)">
-      </div>
+  <div class="game-dropdown" ng-show="showingDropdown"
+    ng-style="dropdownStyle">
+    <div class="dropdown-action" ng-repeat="action in dropdownActions">
+      <input class="dropdown-button" type="button"
+        value="{{action.title}}" ng-click="doAction(action)">
     </div>
   </div>
 
@@ -86,12 +87,34 @@
             )
           </td>
         </tr>
-        <tr>
+        <!-- <tr>
           <td class="data-title">Depth</td>
           <td>{{depth}}</td>
         </tr>
+         -->
+        <tr>
+          <td class="data-title">Points</td>
+          <td>{{points}}</td>
+        </tr>
+        <tr>
+          <td class="data-title">Firepower</td>
+          <td>{{firepower}}</td>
+        </tr>
+        <tr>
+          <td class="data-title">Health</td>
+          <td>{{health}} / {{max_health}}</td>
+        </tr>
+        <tr>
+          <td colspan="2" class="current-action">{{currentAction}}</td>
+        </tr>
       </tbody>
     </table>
+  </div>
+
+  <div id="events">
+    <div ng-repeat="event in events">
+      <span ng-class="'event-' + event.event_type">{{event.message}}</span>
+    </div>
   </div>
 </body>
 </html>
