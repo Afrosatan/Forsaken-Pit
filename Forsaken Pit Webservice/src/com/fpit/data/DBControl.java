@@ -120,6 +120,22 @@ public class DBControl {
 		}
 	}
 
+	/**
+	 * @see ConnectionWrapper#update(String, DBRow, Map)
+	 */
+	public void update(String tableName, DBRow row,
+			Map<String, Object> fieldValues) throws SQLException {
+		ConnectionWrapper wrapper = null;
+		try {
+			wrapper = new ConnectionWrapper(getConnection());
+			wrapper.update(tableName, row, fieldValues);
+		} finally {
+			if (wrapper != null) {
+				wrapper.close();
+			}
+		}
+	}
+
 	public void close() {
 		pool.close();
 		pool = null;

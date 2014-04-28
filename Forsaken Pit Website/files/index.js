@@ -22,6 +22,7 @@ function IndexCtrl($scope, $pitweb, $timeout) {
 		$scope.cellRows.push(cellRow);
 	}
 	$scope.events = [];
+	$scope.leaderboard = [];
 
 	var updatePromise = null;
 	function resetUpdate() {
@@ -55,6 +56,7 @@ function IndexCtrl($scope, $pitweb, $timeout) {
 			$scope.cellRows[obj.y][obj.x].objs.push(obj);
 		}
 		$scope.events = data.events;
+		$scope.leaderboard = data.leaderboard;
 		resetUpdate();
 		updatePromise = $timeout(update, 1000);
 	};
@@ -215,7 +217,7 @@ function IndexCtrl($scope, $pitweb, $timeout) {
 			y = 1;
 		}
 		if (x !== 0 || y !== 0) {
-			$scope.currentAction = "Move";
+			$scope.currentAction = "Moving";
 			$pitweb.move(player_key, x, y, $scope.moveCall);
 		}
 	}
@@ -257,9 +259,9 @@ function IndexCtrl($scope, $pitweb, $timeout) {
 	$scope.attackId = null;
 
 	var actionPromise = null;
-	$scope.currentAction = "";
+	$scope.currentAction = "Waiting";
 	function resetAction() {
-		$scope.currentAction = "";
+		$scope.currentAction = "Waiting";
 		if (actionPromise) {
 			$timeout.cancel(actionPromise);
 			actionPromise = null;

@@ -1,9 +1,7 @@
 package com.fpit.webservice.attack;
 
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -14,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fpit.Constants;
 import com.fpit.data.DBRow;
+import com.fpit.util.Util;
 import com.fpit.util.WSUtil;
 import com.fpit.webservice.CommonResource;
 
@@ -102,7 +101,7 @@ public class AttackResource extends CommonResource {
 			}
 			addPlayerPoints(row, request.player_key, newPoints);
 
-			createGameEvent(row, actorRow);
+			Util.createDamageEvent(getDb(), row, actorRow);
 
 			response.attacked = true;
 			response.waitMillis = 1500;
@@ -112,34 +111,6 @@ public class AttackResource extends CommonResource {
 			logger.error("move error", th);
 			return WSUtil.error();
 		}
-	}
-
-	private void createGameEvent(DBRow playerRow, DBRow targetRow)
-			throws SQLException {
-		Map<String, Object> fvs = new HashMap<>();
-		if (targetRow.getInt("health") > playerRow.getInt("firepower")) {
-			fvs.put("event_type", "attack");
-			fvs.put("message",
-					playerRow.getString("name")
-							+ " attacked "
-							+ targetRow.getString("name")
-							+ " for "
-							+ playerRow.getInt("firepower")
-							+ " ("
-							+ (targetRow.getInt("health") - playerRow
-									.getInt("firepower")) + " health left)");
-		} else {
-			fvs.put("event_type", "kill");
-			fvs.put("message", playerRow.getString("name") + " killed "
-					+ targetRow.getString("name"));
-		}
-		fvs.put("level_depth", playerRow.getInt("level_depth"));
-		fvs.put("x", playerRow.getInt("x"));
-		fvs.put("y", playerRow.getInt("y"));
-		fvs.put("event_time", System.currentTimeMillis());
-		fvs.put("source_actor_id", playerRow.getLong("id"));
-		fvs.put("target_actor_id", targetRow.getLong("id"));
-		getDb().directInsert("game_event", fvs);
 	}
 
 	private void addPlayerPoints(DBRow playerRow, String player_key,

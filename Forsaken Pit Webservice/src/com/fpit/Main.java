@@ -77,6 +77,10 @@ public class Main {
 		cleanupThread.setDaemon(true);
 		cleanupThread.start();
 
+		final Thread monsterAIThread = new Thread(new MonsterAI());
+		monsterAIThread.setDaemon(true);
+		monsterAIThread.start();
+
 		logger.info("Application started... {}", uri);
 		try {
 			while (true) {

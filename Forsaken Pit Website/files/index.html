@@ -109,6 +109,27 @@
         </tr>
       </tbody>
     </table>
+    <div>
+      <table class="leaderboard">
+        <thead>
+          <tr class="data-title">
+            <td colspan="3">Leaderboard</td>
+          </tr>
+          <tr>
+            <td>#</td>
+            <td>Name</td>
+            <td>Points</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="leader in leaderboard">
+            <td>{{$index + 1}}</td>
+            <td>{{leader.name}}</td>
+            <td>{{leader.points}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <div id="events">

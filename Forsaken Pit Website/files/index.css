@@ -118,3 +118,11 @@ label[for="type-blue"],.Blue {
 	font-size: 1.5em;
 	font-weight: bold;
 }
+
+.leaderboard td {
+	padding: 2px 5px;
+}
+
+.leaderboard .data-title {
+	font-size: 1.25em;
+}

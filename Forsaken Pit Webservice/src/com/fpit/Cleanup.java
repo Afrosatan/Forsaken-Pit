@@ -15,20 +15,20 @@ public class Cleanup extends CommonResource implements Runnable {
 	public void run() {
 		while (true) {
 			try {
-				Thread.sleep(30000);
+				Thread.sleep(10000);
 
 				long currentMillis = System.currentTimeMillis();
 
 				getDb().directExecute(
 						"delete from game_event where event_time < ?",
-						currentMillis - 60000);
+						currentMillis - 10000);
 
 				getDb().directExecute(
 						"delete from player p where p.actor_id in (select a.id from actor a where a.next_action_time < ?)",
-						currentMillis - 600000);
+						currentMillis - 300000);
 				getDb().directExecute(
 						"delete from actor where next_action_time < ?",
-						currentMillis - 600000);
+						currentMillis - 300000);
 			} catch (Throwable th) {
 				logger.error("error in cleanup", th);
 			}

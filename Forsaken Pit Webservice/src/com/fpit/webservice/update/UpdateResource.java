@@ -58,53 +58,9 @@ public class UpdateResource extends CommonResource {
 			int plevel = playerRow.getInt("level_depth");
 			int px = playerRow.getInt("x");
 			int py = playerRow.getInt("y");
-
-			int minx = Util.mymod(px - 5);
-			int maxx = Util.mymod(px + 5);
-			int miny = Util.mymod(py - 5);
-			int maxy = Util.mymod(py + 5);
-
-			List<Rectangle> rects = new ArrayList<>();
-			if (minx > maxx && miny > maxy) {
-				rects.add(new Rectangle(minx, miny, Constants.MAP_SIZE - 1,
-						Constants.MAP_SIZE - 1));
-				rects.add(new Rectangle(0, miny, maxx, Constants.MAP_SIZE - 1));
-				rects.add(new Rectangle(minx, 0, Constants.MAP_SIZE - 1, maxy));
-				rects.add(new Rectangle(0, 0, maxx, maxy));
-			} else if (minx > maxx) {
-				rects.add(new Rectangle(minx, miny, Constants.MAP_SIZE - 1,
-						maxy));
-				rects.add(new Rectangle(0, miny, maxx, maxy));
-			} else if (miny > maxy) {
-				rects.add(new Rectangle(minx, miny, maxx,
-						Constants.MAP_SIZE - 1));
-				rects.add(new Rectangle(minx, 0, maxx, maxy));
-			} else {
-				rects.add(new Rectangle(minx, miny, maxx, maxy));
-			}
-
-			StringBuilder query = new StringBuilder();
-			boolean first = true;
-			Object[] params = new Object[5 * rects.size()];
-			int pi = 0;
-			for (Rectangle rect : rects) {
-				if (first) {
-					first = false;
-				} else {
-					query.append("\nUNION ALL ");
-				}
-				query.append("select a.id, a.actor_type, a.name, a.x, a.y "
-						+ "from actor a "
-						+ "where a.level_depth = ? and a.x >= ? and a.x <= ? "
-						+ "and a.y >= ? and a.y <= ? and a.health > 0 ");
-				params[pi++] = plevel;
-				params[pi++] = rect.x;
-				params[pi++] = rect.width; // the names aren't right i stored the right/bottom bounds
-				params[pi++] = rect.y;
-				params[pi++] = rect.height;
-			}
-			List<DBRow> actorRows = getDb().query(query.toString(), params);
-			for (DBRow actorRow : actorRows) {
+			List<Rectangle> rects = Util.getNearbyRects(px, py);
+			for (DBRow actorRow : Util.getNearbyActors(getDb(), plevel, rects,
+					"")) {
 				PitObject obj = new PitObject();
 				obj.id = actorRow.getLong("id");
 				obj.name = actorRow.getString("name");
@@ -126,35 +82,21 @@ public class UpdateResource extends CommonResource {
 				response.objs.add(obj);
 			}
 
-			query = new StringBuilder();
-			first = true;
-			params = new Object[5 * rects.size()];
-			pi = 0;
-			for (Rectangle rect : rects) {
-				if (first) {
-					first = false;
-				} else {
-					query.append("\nUNION ALL ");
-				}
-				query.append("select e.event_type, e.message, e.event_time "
-						+ "from game_event e "
-						+ "where e.level_depth = ? and e.x >= ? and e.x <= ? "
-						+ "and e.y >= ? and e.y <= ? ");
-				params[pi++] = plevel;
-				params[pi++] = rect.x;
-				params[pi++] = rect.width; // the names aren't right i stored the right/bottom bounds
-				params[pi++] = rect.y;
-				params[pi++] = rect.height;
-			}
-			List<DBRow> eventRows = getDb().query(
-					query.toString() + " order by event_time desc limit 10",
-					params);
 			response.events = new ArrayList<>();
-			for (DBRow eventRow : eventRows) {
+			for (DBRow eventRow : Util.getNearbyEvents(getDb(), plevel, rects)) {
 				PitEvent event = new PitEvent();
 				event.event_type = eventRow.getString("event_type");
 				event.message = eventRow.getString("message");
 				response.events.add(event);
+			}
+
+			response.leaderboard = new ArrayList<>();
+			for (DBRow row : getDb()
+					.query("select a.name, p.points from actor a join player p on p.actor_id = a.id order by p.points desc limit 10")) {
+				Leader leader = new Leader();
+				leader.name = row.getString("name");
+				leader.points = row.getInt("points");
+				response.leaderboard.add(leader);
 			}
 
 			return WSUtil.success(response);

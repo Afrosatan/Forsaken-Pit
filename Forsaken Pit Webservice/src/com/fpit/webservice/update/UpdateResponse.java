@@ -18,4 +18,5 @@ public class UpdateResponse {
 	public int max_health;
 	public int points;
 	public List<PitEvent> events;
+	public List<Leader> leaderboard;
 }

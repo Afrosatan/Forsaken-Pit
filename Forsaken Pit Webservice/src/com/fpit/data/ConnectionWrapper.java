@@ -9,9 +9,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fpit.data.DBMetaData.DBFieldData;
 
 /**
  * Wrapper around a single database Connection.
@@ -142,6 +145,89 @@ public class ConnectionWrapper {
 		});
 
 		return key.key;
+	}
+
+	/**
+	 * Update the table/row provided with new values.
+	 * @param tableName The name of the table to update a record in.
+	 * @param row Row with the current DB values of the row to be updated. This row will be updated with values from fieldValues if the update succeeds.
+	 * @param fieldValues Map with the new column values for the row.
+	 */
+	public void update(String tableName, DBRow row,
+			Map<String, Object> fieldValues) throws SQLException {
+		final List<Object> parameters = new ArrayList<Object>();
+		final StringBuilder sql = new StringBuilder("UPDATE ");
+		sql.append(tableName);
+		sql.append(" SET ");
+		boolean first = true;
+		for (Entry<String, Object> entry : fieldValues.entrySet()) {
+			Object obj = row.getObject(entry.getKey());
+			if (obj == null) {
+				if (entry.getValue() == null) {
+					continue;
+				}
+			} else if (entry.getValue() != null) {
+				if (entry.getValue().equals(obj)) {
+					continue;
+				}
+			}
+			if (first) {
+				first = false;
+			} else {
+				sql.append(", ");
+			}
+			sql.append(entry.getKey());
+			sql.append(" = ? ");
+			parameters.add(entry.getValue());
+		}
+		if (first) { // no changes
+			return;
+		}
+		sql.append(" WHERE ");
+		first = true;
+		for (DBFieldData field : row.getMetadata().getFieldData().values()) {
+			if (first) {
+				first = false;
+			} else {
+				sql.append(" AND ");
+			}
+			Object obj = row.getObject(field.getName());
+			if (obj != null) {
+				sql.append(field.getName());
+				sql.append(" = ? ");
+				parameters.add(obj);
+			} else {
+				sql.append(field.getName());
+				sql.append(" IS NULL ");
+			}
+		}
+
+		logger.trace("SQL: " + sql);
+		logger.trace("Parameters: " + Arrays.toString(parameters.toArray()));
+
+		inTransaction(new RunInTransaction() {
+			@Override
+			public void run(ConnectionWrapper connect) throws SQLException {
+				try (PreparedStatement ps = connection.prepareStatement(sql
+						.toString())) {
+					for (int i = 1; i <= parameters.size(); i++) {
+						ps.setObject(i, parameters.get(i - 1));
+					}
+					int n = ps.executeUpdate();
+					if (n == 0) {
+						throw new SQLException(
+								"No rows affected during update, rolling back");
+					} else if (n > 1) {
+						throw new SQLException(
+								"Multiple rows affected during update, rolling back");
+					}
+				}
+			}
+		});
+
+		for (Entry<String, Object> entry : fieldValues.entrySet()) {
+			row.setObject(entry.getKey(), entry.getValue());
+		}
 	}
 
 	/**
