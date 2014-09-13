@@ -8,7 +8,7 @@ Web based, html/css/js/AngularJS with Java/JAX-RS webservices and postgresql bac
 You are a guy with a gun and and run around underground killing monsters or other players.
 It's multiplayer, and there are leaderboards.
 
-The game is deployed at http://fpit.reiterable.com
+The game is no longer deployed.
 
 How To Play
 ============
